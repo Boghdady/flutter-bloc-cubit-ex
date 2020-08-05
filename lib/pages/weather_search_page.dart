@@ -95,6 +95,7 @@ class CityInputField extends StatelessWidget {
   }
 
   void submitCityName(BuildContext context, String cityName) {
-    context.bloc<WeatherCubit>().getWeather(cityName);
+    final weatherCubit = context.bloc<WeatherCubit>();
+    weatherCubit.getWeather(cityName);
   }
 }
