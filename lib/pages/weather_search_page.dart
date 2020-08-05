@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_cubit_bloc_tutorial/data/model/weather.dart';
+import 'package:flutter_cubit_bloc_tutorial/weather_cubit.dart';
 
 class WeatherSearchPage extends StatefulWidget {
   @override
@@ -16,8 +18,27 @@ class _WeatherSearchPageState extends State<WeatherSearchPage> {
       body: Container(
         padding: EdgeInsets.symmetric(vertical: 16),
         alignment: Alignment.center,
-        // TODO: Implement with cubit
-        child: buildInitialInput(),
+        child: BlocConsumer<WeatherCubit, WeatherState>(
+          builder: (BuildContext context, state) {
+            if (state is WeatherInitial) {
+              return buildInitialInput();
+            } else if (state is WeatherLoading) {
+              return buildLoading();
+            } else if (state is WeatherLoaded) {
+              return buildColumnWithData(state.weather);
+            } else {
+              // (state is WeatherError)
+              return buildInitialInput();
+            }
+          },
+          listener: (BuildContext context, state) {
+            if (state is WeatherError) {
+              Scaffold.of(context).showSnackBar(SnackBar(
+                content: Text(state.message),
+              ));
+            }
+          },
+        ),
       ),
     );
   }
@@ -74,6 +95,6 @@ class CityInputField extends StatelessWidget {
   }
 
   void submitCityName(BuildContext context, String cityName) {
-    // TODO: Get weather for the city
+    context.bloc<WeatherCubit>().getWeather(cityName);
   }
 }
